@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08090c">
+  <meta name="description" content="NEXORA CAMERA X — mobile camera studio">
+  <title>NEXORA CAMERA X</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="main.js" defer></script>
+</head>
+<body>
+  <main class="app" id="app">
+    <header class="topbar">
+      <button class="icon-btn" id="openSettings" aria-label="Camera settings"
+              title="Settings">☷</button>
+      <div class="brand">
+        <span class="brand-name">NEXORA</span>
+        <span class="brand-sub">CAMERA X</span>
+      </div>
+      <button class="icon-btn" id="openTools" aria-label="Camera tools"
+              title="Tools">⌘</button>
+    </header>
+
+    <section class="viewfinder" id="viewfinder">
+      <video id="cameraVideo" autoplay playsinline muted></video>
+      <canvas id="previewCanvas" aria-label="Processed camera preview"></canvas>
+
+      <div class="viewfinder-overlay" id="viewfinderOverlay">
+        <div class="grid-lines" id="gridLines" hidden>
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+        </div>
+        <div class="focus-reticle" id="focusReticle" hidden></div>
+        <div class="scanner-frame" id="scannerFrame" hidden>
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="camera-loading" id="cameraLoading">
+        <div class="spinner"></div>
+        <span id="loadingText">Starting camera…</span>
+      </div>
+
+      <div class="camera-placeholder" id="cameraPlaceholder">
+        <div class="placeholder-icon">◉</div>
+        <p>Camera preview</p>
+        <span>Start the camera to begin</span>
+        <button class="primary-btn" id="startCamera">Start camera</button>
+      </div>
+
+      <div class="top-overlay">
+        <span class="live-indicator" id="liveIndicator">
+          <i></i> LIVE
+        </span>
+        <span class="resolution-pill" id="resolutionLabel">AUTO</span>
+      </div>
+
+      <div class="side-controls">
+        <button class="float-btn" id="toggleFlash" aria-label="Toggle torch"
+                title="Torch">ϟ</button>
+        <button class="float-btn" id="toggleGrid" aria-label="Toggle grid"
+                title="Composition grid">▦</button>
+        <button class="float-btn" id="openFilters" aria-label="Open filters"
+                title="Filters">◐</button>
+        <button class="float-btn" id="openTimer" aria-label="Set timer"
+                title="Timer">◷</button>
+      </div>
+
+      <div class="zoom-control" id="zoomControl">
+        <button class="zoom-chip active" data-zoom="1">1×</button>
+        <button class="zoom-chip" data-zoom="2">2×</button>
+        <button class="zoom-chip" data-zoom="3">3×</button>
+        <button class="zoom-chip" data-zoom="5">5×</button>
+        <button class="zoom-chip" data-zoom="10">10×</button>
+      </div>
+    </section>
+
+    <section class="capture-review" id="captureReview" hidden>
+      <img id="reviewImage" alt="Captured photo review">
+      <video id="reviewVideo" controls playsinline hidden></video>
+      <div class="review-info" id="reviewInfo"></div>
+      <div class="review-actions">
+        <button class="secondary-btn" id="retakePhoto">Retake</button>
+        <button class="secondary-btn" id="reviewFilter">Filters</button>
+        <button class="primary-btn" id="saveCapture">Save</button>
+        <button class="secondary-btn" id="shareCapture">Share</button>
+      </div>
+    </section>
+
+    <section class="filter-tray" id="filterTray" hidden>
+      <div class="tray-heading">
+        <span>LOOKS</span>
+        <button class="text-btn" id="closeFilters">Done</button>
+      </div>
+      <div class="filter-list" id="filterList">
+        <button class="filter-item active" data-filter="natural">
+          <span class="filter-swatch natural"></span><span>Natural</span>
+        </button>
+        <button class="filter-item" data-filter="warm">
+          <span class="filter-swatch warm"></span><span>Warm</span>
+        </button>
+        <button class="filter-item" data-filter="cool">
+          <span class="filter-swatch cool"></span><span>Cool</span>
+        </button>
+        <button class="filter-item" data-filter="vivid">
+          <span class="filter-swatch vivid"></span><span>Vivid</span>
+        </button>
+        <button class="filter-item" data-filter="soft">
+          <span class="filter-swatch soft"></span><span>Soft</span>
+        </button>
+        <button class="filter-item" data-filter="portrait">
+          <span class="filter-swatch portrait"></span><span>Portrait</span>
+        </button>
+        <button class="filter-item" data-filter="vintage">
+          <span class="filter-swatch vintage"></span><span>Vintage</span>
+        </button>
+        <button class="filter-item" data-filter="cinema">
+          <span class="filter-swatch cinema"></span><span>Cinema</span>
+        </button>
+        <button class="filter-item" data-filter="mono">
+          <span class="filter-swatch mono"></span><span>Mono</span>
+        </button>
+        <button class="filter-item" data-filter="fade">
+          <span class="filter-swatch fade"></span><span>Fade</span>
+        </button>
+        <button class="filter-item" data-filter="original">
+          <span class="filter-swatch original"></span><span>Original</span>
+        </button>
+      </div>
+      <p class="tray-note">Filters affect photos you capture and save.</p>
+    </section>
+
+    <nav class="mode-selector" id="modeSelector" aria-label="Shooting mode">
+      <button class="mode-btn active" data-mode="photo">PHOTO</button>
+      <button class="mode-btn" data-mode="video">VIDEO</button>
+      <button class="mode-btn" data-mode="portrait">PORTRAIT</button>
+      <button class="mode-btn" data-mode="night">NIGHT</button>
+      <button class="mode-btn" data-mode="timelapse">TIME-LAPSE</button>
+      <button class="mode-btn" data-mode="panorama">PANO</button>
+      <button class="mode-btn" data-mode="slowmotion">SLOW-MO</button>
+    </nav>
+
+    <section class="bottom-controls" id="bottomControls">
+      <button class="gallery-thumb" id="openLastCapture"
+              aria-label="Open last capture">
+        <img id="lastCaptureThumb" alt="" hidden>
+        <span id="galleryPlaceholder">▧</span>
+      </button>
+
+      <button class="shutter" id="shutter" aria-label="Take photo">
+        <span class="shutter-inner" id="shutterInner"></span>
+      </button>
+
+      <button class="icon-btn switch-camera" id="switchCamera"
+              aria-label="Switch front or rear camera"
+              title="Switch camera">⇄</button>
+    </section>
+
+    <div class="recording-status" id="recordingStatus" hidden>
+      <i></i><span id="recordingTime">00:00</span>
+      <button id="stopRecording">STOP</button>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <section class="panel-backdrop" id="panelBackdrop" hidden>
+      <div class="panel" id="settingsPanel" role="dialog"
+           aria-modal="true" aria-label="Camera settings" hidden>
+        <div class="panel-handle"></div>
+        <div class="panel-heading">
+          <h2>Camera settings</h2>
+          <button class="icon-btn close-panel" aria-label="Close">×</button>
+        </div>
+        <div class="panel-content">
+          <label class="setting-row">
+            <span>Camera device</span>
+            <select id="cameraSelect">
+              <option value="">Automatic</option>
+            </select>
+          </label>
+
+          <label class="setting-row">
+            <span>Resolution</span>
+            <select id="resolutionSelect">
+              <option value="auto">Auto</option>
+              <option value="720">HD · 720p</option>
+              <option value="1080">Full HD · 1080p</option>
+              <option value="480">480p</option>
+            </select>
+          </label>
+
+          <label class="setting-row">
+            <span>Photo aspect ratio</span>
+            <select id="aspectSelect">
+              <option value="native">Native</option>
+              <option value="4:3">4:3</option>
+              <option value="16:9">16:9</option>
+              <option value="1:1">1:1</option>
+            </select>
+          </label>
+
+          <label class="setting-row">
+            <span>Image quality</span>
+            <select id="qualitySelect">
+              <option value="0.95">High</option>
+              <option value="0.85">Balanced</option>
+              <option value="0.7">Smaller file</option>
+            </select>
+          </label>
+
+          <label class="setting-row">
+            <span>Timer</span>
+            <select id="timerSelect">
+              <option value="0">Off</option>
+              <option value="3">3 seconds</option>
+              <option value="5">5 seconds</option>
+              <option value="10">10 seconds</option>
+            </select>
+          </label>
+
+          <label class="setting-row">
+            <span>Exposure compensation</span>
+            <input type="range" id="exposureSlider"
+                   min="-2" max="2" step="0.5" value="0">
+            <output id="exposureValue">0</output>
+          </label>
+
+          <label class="setting-row">
+            <span>Digital zoom fallback</span>
+            <input type="checkbox" id="digitalZoomToggle" checked>
+          </label>
+
+          <label class="setting-row">
+            <span>Capture sound</span>
+            <input type="checkbox" id="captureSoundToggle">
+          </label>
+
+          <p class="panel-note">
+            Available controls depend on your camera and browser. Digital zoom
+            may reduce image detail.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel" id="toolsPanel" role="dialog"
+           aria-modal="true" aria-label="Camera tools" hidden>
+        <div class="panel-handle"></div>
+        <div class="panel-heading">
+          <h2>Camera tools</h2>
+          <button class="icon-btn close-panel" aria-label="Close">×</button>
+        </div>
+        <div class="tool-grid">
+          <button class="tool-card" id="toolQR"><span>▣</span>QR Scanner</button>
+          <button class="tool-card" id="toolFilters"><span>◐</span>Filters</button>
+          <button class="tool-card" id="toolGrid"><span>▦</span>Grid</button>
+          <button class="tool-card" id="toolTimer"><span>◷</span>Timer</button>
+          <button class="tool-card" id="toolSwitch"><span>⇄</span>Switch camera</button>
+          <button class="tool-card" id="toolInfo"><span>ⓘ</span>Capabilities</button>
+        </div>
+        <div class="panel-content">
+          <div class="qr-result" id="qrResult" hidden>
+            <h3>QR result</h3>
+            <p id="qrResultText"></p>
+            <button class="secondary-btn" id="copyQR">Copy result</button>
+            <button class="secondary-btn" id="openQRLink" hidden>Review link</button>
+            <button class="text-btn" id="closeQRResult">Close result</button>
+          </div>
+          <div class="capability-info" id="capabilityInfo" hidden></div>
+        </div>
+      </div>
+
+      <div class="panel" id="timerPanel" role="dialog"
+           aria-modal="true" aria-label="Timer" hidden>
+        <div class="panel-handle"></div>
+        <div class="panel-heading">
+          <h2>Self-timer</h2>
+          <button class="icon-btn close-panel" aria-label="Close">×</button>
+        </div>
+        <div class="timer-options">
+          <button class="timer-option active" data-seconds="0">Off</button>
+          <button class="timer-option" data-seconds="3">3s</button>
+          <button class="timer-option" data-seconds="5">5s</button>
+          <button class="timer-option" data-seconds="10">10s</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>NEXORA CAMERA X</span>
+      <span id="secureContextLabel">Camera requires a secure context</span>
+    </footer>
+  </main>
+</body>
+</html>
